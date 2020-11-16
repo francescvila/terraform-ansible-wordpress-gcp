@@ -1,0 +1,5 @@
+# Host volumes
+vol_apache2_logs: "/srv/apache2/logs"
+vol_mysql_logs: "/srv/mysql/logs"
+vol_mysql_data: "/srv/mysql/data"
+vol_wordpress: "/srv/wordpress"

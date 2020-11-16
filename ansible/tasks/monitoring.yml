@@ -1,0 +1,59 @@
+- name: Download stackdriver monitoring agent
+  get_url:
+    url: https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+    dest: /tmp/add-monitoring-agent-repo.sh
+
+- name: Add stackdriver agent repo to APT
+  command: bash /tmp/add-monitoring-agent-repo.sh
+
+- name: Install Stackdriver agent
+  apt:
+    name: ['stackdriver-agent=6.0.3*']
+    state: present
+    update_cache: yes
+
+- name: Enable stackdriver monitoring agent for Apache
+  get_url:
+    url: https://raw.githubusercontent.com/Stackdriver/stackdriver-agent-service-configs/master/etc/collectd.d/apache.conf
+    dest: /opt/stackdriver/collectd/etc/collectd.d/
+
+- name: Enable stackdriver monitoring agent for MySQL
+  get_url:
+    url: https://raw.githubusercontent.com/Stackdriver/stackdriver-agent-service-configs/master/etc/collectd.d/mysql.conf
+    dest: /opt/stackdriver/collectd/etc/collectd.d/
+
+- name: Fix mysql hostname in stackdriver module conf file
+  replace:
+    path: /opt/stackdriver/collectd/etc/collectd.d/mysql.conf
+    regexp: 'localhost'
+    replace: '127.0.0.1'
+    
+- name: Add mysql username in stackdriver module conf file
+  replace:
+    path: /opt/stackdriver/collectd/etc/collectd.d/mysql.conf
+    regexp: 'STATS_USER'
+    replace: '{{ stats_user }}'
+
+- name: Add mysql password in stackdriver module conf file
+  replace:
+    path: /opt/stackdriver/collectd/etc/collectd.d/mysql.conf
+    regexp: 'STATS_PASS'
+    replace: '{{ stats_pass }}'
+
+- name: Disable master stats in stackdriver module conf file
+  replace:
+    path: /opt/stackdriver/collectd/etc/collectd.d/mysql.conf
+    regexp: 'MasterStats true'
+    replace: 'MasterStats false'
+
+- name: Disable slave stats in stackdriver module conf file
+  replace:
+    path: /opt/stackdriver/collectd/etc/collectd.d/mysql.conf
+    regexp: 'SlaveStats true'
+    replace: 'SlaveStats false'
+
+- name: Restart the stackdriver monitoring agent
+  systemd:
+    state: restarted
+    name: stackdriver-agent
+

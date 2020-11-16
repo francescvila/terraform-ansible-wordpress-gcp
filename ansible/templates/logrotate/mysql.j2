@@ -1,0 +1,13 @@
+# Mysql
+{{ vol_mysql_logs }}/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    notifempty
+    create 644 root root 
+    sharedscripts
+    postrotate
+      /usr/bin/docker exec mysql sh -c "service mysql reload" > /dev/null 2>&1
+    endscript
+}

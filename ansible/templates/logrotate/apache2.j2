@@ -1,0 +1,13 @@
+# Apache2 WordPress
+{{ vol_apache2_logs }}/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    notifempty
+    create 644 root root 
+    sharedscripts
+    postrotate
+      /usr/bin/docker exec wordpress sh -c "service apache2 reload" > /dev/null 2>&1
+    endscript
+}

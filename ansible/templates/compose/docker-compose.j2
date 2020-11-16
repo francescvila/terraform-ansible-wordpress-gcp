@@ -1,0 +1,43 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    container_name: wordpress
+    image: wordpress:5.5.3-php7.2-apache
+    ports:
+      - "{{ http_port }}:80"
+    depends_on:
+      - mysql
+    volumes:
+      - "{{ vol_apache2_logs }}:/var/log/apache2"
+      - "{{ vol_wordpress }}:/var/www/html"
+    restart: always
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE={{ mysql_name }}
+      - MYSQL_USER={{ mysql_user }}
+      - MYSQL_PASSWORD={{ mysql_pass }}
+      - MYSQL_ROOT_PASSWORD={{ mysql_root_pass }}
+    ports:
+      - "{{ mysql_port }}:3306"
+    volumes:
+      - "{{ vol_mysql_logs }}:/var/log/mysql"
+      - "{{ vol_mysql_data }}:/var/lib/mysql"
+    restart: always
+
+  sftp:  
+    image: atmoz/sftp
+    container_name: sftp
+    volumes:
+      - "{{ vol_apache2_logs }}:/home/{{ sftp_username }}/apache2-logs"
+      - "{{ vol_wordpress }}:/home/{{ sftp_username }}/wordpress"
+      - "{{ vol_mysql_logs }}:/home/{{ sftp_username }}/mysql-logs"
+    ports:
+      - "{{ sftp_port }}:22"
+    restart: always
+    command: "{{ sftp_username }}:{{ sftp_password }}:33"
+

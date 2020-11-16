@@ -1,0 +1,9 @@
+account.json
+.terraform
+.env
+terraform.tfstate
+terraform.tfstate.backup
+id_rsa
+id_rsa.pub
+vault_pass
+secret.yml

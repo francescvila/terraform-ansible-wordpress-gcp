@@ -1,0 +1,58 @@
+- name: Include project volume paths
+  include_vars: "../vars/volumes.yml"
+
+- name: Create Apache logs volume directory  
+  file:
+    path: '{{ vol_apache2_logs }}'
+    owner: root
+    group: root
+    state: directory
+    mode: '0755'
+
+- name: Create MySQL logs volume directory
+  file:
+    path: '{{ vol_mysql_logs }}'
+    owner: root
+    group: root
+    state: directory
+    mode: '0777'
+
+- name: Create MySQL data volume directory
+  file:
+    path: '{{ vol_mysql_data }}'
+    owner: root
+    group: root
+    state: directory
+    mode: '0777'
+
+- name: Create WordPress volume directory
+  file:
+    path: '{{ vol_wordpress }}'
+    owner: www-data
+    group: www-data
+    state: directory
+    mode: '0755'
+
+- name: Create WordPress status file
+  file:
+    path: '{{ vol_wordpress }}/status'
+    owner: www-data
+    group: www-data
+    state: touch
+    mode: '0644'
+
+- name: Generate logrotate config for Apache2 logs
+  template:
+    src: ../templates/logrotate/apache2.j2
+    dest: "/etc/logrotate.d/apache2"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Generate logrotate config for MySQL logs
+  template:
+    src: ../templates/logrotate/mysql.j2
+    dest: "/etc/logrotate.d/mysql"
+    owner: root
+    group: root
+    mode: '0644'
